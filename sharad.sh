@@ -2,9 +2,17 @@
 
 OPENCV_CONFIG=release
 
-source /home/sps/Source/github/sps-gold/emsdk/emsdk_env.sh
+# to setup emscripten environment follow the steps under
+# https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended
 
-export EMSCRIPTEN=/home/sps/Source/github/sps-gold/emsdk/upstream/emscripten
+local_path=/home/sps/Source/github/sps-gold
+
+# we also need a patch to fix opencv build script
+git apply sharad.patch
+
+source $local_path/emsdk/emsdk_env.sh
+
+export EMSCRIPTEN=$local_path/emsdk/upstream/emscripten
 
 emcmake python3 /home/sps/Source/github/opencv/platforms/js/build_js.py \
     build --build_wasm \
@@ -15,8 +23,8 @@ emcmake python3 /home/sps/Source/github/opencv/platforms/js/build_js.py \
     --cmake_option="-DENABLE_PIC=ON" \
     --cmake_option="-DBUILD_opencv_imgcodecs=ON" \
     --build_flags="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm" \
-    -DCMAKE_CROSSCOMPILING_EMULATOR=/home/sps/Source/github/sps-gold/emsdk/node/14.18.2_64bit/bin/node \
-    -DCMAKE_TOOLCHAIN_FILE=/home/sps/Source/github/sps-gold/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+    -DCMAKE_CROSSCOMPILING_EMULATOR=$local_path/emsdk/node/14.18.2_64bit/bin/node \
+    -DCMAKE_TOOLCHAIN_FILE=$local_path/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 
 
 
